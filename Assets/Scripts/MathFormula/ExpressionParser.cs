@@ -20,6 +20,11 @@ namespace EEA.MathParser
             variables.Add(variable.Name, variable.Value);
         }
 
+        public void UpateVariable(Variable variable)
+        {
+            variables[variable.Name] =  variable.Value;
+        }
+
         public double Parse(string expression)
         {
             Stack<char> operators = new Stack<char>();

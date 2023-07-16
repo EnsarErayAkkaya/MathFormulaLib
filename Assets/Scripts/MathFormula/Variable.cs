@@ -3,6 +3,20 @@ using UnityEngine;
 namespace EEA.MathParser
 {
     [System.Serializable]
+    public class ScalingVariable
+    {
+        [SerializeField] private Variable variable;
+        
+        [SerializeField] private double max;
+
+        [SerializeField] private double step;
+
+        public Variable Variable { get => variable; set => variable = value; }
+        public double Max { get => max; set => max = value; }
+        public double Step { get => step; set => step = value; }
+    }
+
+    [System.Serializable]
     public class Variable
     {
         [SerializeField] private char name;
@@ -19,5 +33,7 @@ namespace EEA.MathParser
             name = _name;
             value = _value;
         }
+
+        public void SetValue(double val) => value = val;
     }
 }

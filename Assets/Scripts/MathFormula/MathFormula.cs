@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace EEA.MathParser
 {
@@ -9,11 +10,22 @@ namespace EEA.MathParser
 
         public List<Variable> variables = new List<Variable>();
 
-        public void SetVariable(char name, double value)
+        public void CreateVariable(char name, double value = 0)
         {
             Variable variable = new Variable(name, value);
 
+            variables.Add(variable);
+
             parser.SetVariable(variable);
+        }
+
+        public void UpdateVariable(char name, double value)
+        {
+            var variable =variables.FirstOrDefault(s => s.Name == name);
+            
+            variable.SetValue(value);
+
+            parser.UpateVariable(variable);
         }
 
         public double Parse(string expression)
