@@ -194,6 +194,118 @@ namespace EEA.MathParser
 
                     return Math.Pow(innerValue, parameters[0]);
 
+                case "sin":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: sin");
+                    }
+
+                    return Math.Sin(innerValue);
+
+                case "cos":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: cos");
+                    }
+
+                    return Math.Cos(innerValue);
+                
+                case "tan":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: tan");
+                    }
+
+                    return Math.Tan(innerValue);
+
+                case "cotan":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: cot");
+                    }
+
+                    return 1/Math.Tan(innerValue);
+
+                case "ceil":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: ceil");
+                    }
+
+                    return Math.Ceiling(innerValue);
+
+                case "floor":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: floor");
+                    }
+
+                    return Math.Floor(innerValue);
+
+                case "clamp":
+                    if (parameters.Count != 2)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: clamp");
+                    }
+
+                    return Math.Clamp(innerValue, parameters[0], parameters[1]);
+
+                case "log":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: log");
+                    }
+
+                    return Math.Log(innerValue);
+
+                case "log10":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: Log10");
+                    }
+
+                    return Math.Log10(innerValue);
+
+                case "min":
+                    if (parameters.Count != 1)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: min");
+                    }
+
+                    return Math.Min(innerValue, parameters[0]);
+
+                case "max":
+                    if (parameters.Count != 1)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: max");
+                    }
+
+                    return Math.Max(innerValue, parameters[0]);
+
+                case "round":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: round");
+                    }
+
+                    return Math.Round(innerValue);
+
+                case "sign":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: sign");
+                    }
+
+                    return Math.Sign(innerValue);
+
+                case "trunc":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: trunc");
+                    }
+
+                    return Math.Truncate(innerValue);
+
                 default:
                     return 0;
             }

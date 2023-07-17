@@ -17,42 +17,41 @@ public class main : MonoBehaviour
     [SerializeField] private ChartVisualizer chartVisualizer;
     [SerializeField] private ExpressionHolder expression;
 
+    MathFormula formula = new MathFormula();
+
     void Start()
     {
-        MathFormula formula = new MathFormula();
-
         foreach (var item in expression.variables)
         {
-            formula.CreateVariable(item.Variable.Name, item.Variable.Value);
+            formula.CreateVariable(item.Name, item.Value);
         }
 
         List<Vector2> values = new List<Vector2>();
 
         bool variableReachedLimit = false;
 
-
         while (!variableReachedLimit)
         {
             float result = (float)formula.Parse(expression.expression);
 
-            Debug.LogFormat("expr: " + expression.expression + ", result: " + result.ToString());
+            //Debug.LogFormat("expr: " + expression.expression + ", result: " + result.ToString());
 
-            values.Add(new Vector2((float)expression.variables[0].Variable.Value, result));
+            values.Add(new Vector2((float)expression.variables[0].Value, result));
 
             // UPDATE VARIABLE WITH STEP 
             foreach (var item in expression.variables)
             {
-                double val = item.Variable.Value + item.Step;
+                double val = item.Value + item.Step;
 
-                item.Variable.SetValue(val);
+                item.SetValue(val);
 
-                if (item.Variable.Value >= item.Max)
+                if (item.Value >= item.Max)
                 {
                     variableReachedLimit = true;
                     break;
                 }
 
-                formula.UpdateVariable(item.Variable.Name, item.Variable.Value);
+                formula.UpdateVariable(item.Name, item.Value);
             }
         }
 

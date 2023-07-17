@@ -21,7 +21,7 @@ namespace EEA.MathParser
 
         public void UpdateVariable(char name, double value)
         {
-            var variable =variables.FirstOrDefault(s => s.Name == name);
+            var variable = variables.FirstOrDefault(s => s.Name == name);
             
             variable.SetValue(value);
 
