@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 namespace EEA.MathParser
 {
     public class ExpressionParser
@@ -135,6 +137,12 @@ namespace EEA.MathParser
                         index++;
                         while (index + 1 < expression.Length && expression[index + 1] != ')')
                         {
+                            if (IsWhiteSpace(expression[index + 1]))
+                            {
+                                index++;
+                                continue;
+                            }
+
                             if (expression[index + 1] == '.' || char.IsDigit(expression[index + 1]))
                             {
                                 index++;
@@ -167,7 +175,7 @@ namespace EEA.MathParser
 
             index++;
 
-            double innerValue = Parse(innerExpression);
+            double innerValue = (innerExpression.Length > 0) ? Parse(innerExpression) : 0;
 
             switch (func)
             {
@@ -305,6 +313,21 @@ namespace EEA.MathParser
                     }
 
                     return Math.Truncate(innerValue);
+                case "pi":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: pi");
+                    }
+
+                    return Math.PI;
+
+                case "e":
+                    if (parameters.Count > 0)
+                    {
+                        throw new ArgumentException("Invalid functions usage, func: e");
+                    }
+
+                    return Math.E;
 
                 default:
                     return 0;

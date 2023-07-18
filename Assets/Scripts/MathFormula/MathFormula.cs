@@ -19,6 +19,13 @@ namespace EEA.MathParser
             parser.SetVariable(variable);
         }
 
+        public void CreateVariable(Variable variable)
+        {
+            variables.Add(variable);
+
+            parser.SetVariable(variable);
+        }
+
         public void UpdateVariable(char name, double value)
         {
             var variable = variables.FirstOrDefault(s => s.Name == name);
@@ -30,6 +37,13 @@ namespace EEA.MathParser
 
         public double Parse(string expression)
         {
+            return parser.Parse(expression);
+        }
+
+        public double Parse(string expression, Variable variable)
+        {
+            CreateVariable(variable);
+
             return parser.Parse(expression);
         }
 
