@@ -57,6 +57,13 @@ public class main : MonoBehaviour
 
         chartVisualizer.SetUpChart();
 
-        chartVisualizer.PopulateChart(ChartPopulateType.Line, values, Color.red);
+        PopulationConfig config;
+        config.type = ChartPopulateType.Line;
+        config.values = values;
+        config.color = Color.red;
+        config.xAxisKey = "mainX";
+        config.yAxisKey = "mainY";
+
+        chartVisualizer.PopulateChart(config);
     }
 }

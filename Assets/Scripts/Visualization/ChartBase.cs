@@ -5,6 +5,8 @@ using TMPro;
 using Unity.VisualScripting;
 using static UnityEditor.Progress;
 using System.Linq;
+using static UnityEditor.PlayerSettings;
+using UnityEditor;
 
 namespace EEA.Visualizer
 {
@@ -14,8 +16,25 @@ namespace EEA.Visualizer
         public float min;
         public float max;
         public float stepPercent;
+
+        public string title;
+        public string key;
+
+        public AxisType axisType;
+
         public int axisTickTextThinnes;
         public AxisOrientation orientation;
+    }
+
+    [System.Serializable]
+    public struct PopulationConfig
+    {
+        public string xAxisKey;
+        public string yAxisKey;
+
+        public ChartPopulateType type;
+        public List<Vector2> values;
+        public Color color;
     }
 
     [System.Serializable]
@@ -47,22 +66,20 @@ namespace EEA.Visualizer
         [SerializeField] protected Image baseCircle;
 
         [Header("Chart AxisDatas")]
-        [SerializeField] protected AxisData xAxisData;
-        [SerializeField] protected AxisData yAxisData;
+        [SerializeField] protected AxisData[] axisDatas;
 
         [Header("Visualizing Methods")]
         [SerializeField] protected LineRenderer chartLine;
 
-        protected Image xAxisImage;
-        protected Image yAxisImage;
+        protected List<Image> axisImages = new List<Image>();
 
-        protected Dictionary<int, Image> xAxisTicks = new Dictionary<int, Image>();
-        protected Dictionary<int, Image> yAxisTicks = new Dictionary<int, Image>();
-        protected Dictionary<int, TextMeshProUGUI> xAxisTexts = new Dictionary<int, TextMeshProUGUI>();
-        protected Dictionary<int, TextMeshProUGUI> yAxisTexts = new Dictionary<int, TextMeshProUGUI>();
+        protected List<Dictionary<int, Image>> axisTicks = new List<Dictionary<int, Image>>();
+        protected List<Dictionary<int, TextMeshProUGUI>> axisTexts = new List<Dictionary<int, TextMeshProUGUI>>();
 
         protected Dictionary<Image, Vector2> populatedDots = new Dictionary<Image, Vector2>();
         protected List<Vector2> populatedLine = new List<Vector2>();
+
+        protected List<float> stepDists = new List<float>();
 
         protected float currentSizeX;
         protected float currentSizeY;
@@ -70,13 +87,7 @@ namespace EEA.Visualizer
         protected float halfWidth;
         protected float halfHeight;
 
-        protected float stepWidth;
-        protected float stepHeight;
-
-        protected int xStepCount;
-        protected int yStepCount;
-
-        protected ChartPopulateType currentPopulateType;
+        protected PopulationConfig currentPopulationConfig;
 
         // CHECKS CHART SIZE EVERY FRAME
         // UPDATES ONLY IF SIZE CHANGES 
@@ -87,7 +98,7 @@ namespace EEA.Visualizer
 
         protected virtual void OnUpdate()
         {
-            if ((chartRect.sizeDelta.x != currentSizeX) || (chartRect.sizeDelta.y != currentSizeY))
+            if ((chartRect.rect.width != currentSizeX) || (chartRect.rect.height != currentSizeY))
             {
                 OnChartSizeChanged();
             }
@@ -95,54 +106,20 @@ namespace EEA.Visualizer
 
         public virtual void SetUpChart()
         {
-            xAxisImage = Instantiate(baseImage, chartRect);
-            yAxisImage = Instantiate(baseImage, chartRect);
+            foreach (var item in axisDatas)
+            {
+                axisImages.Add(Instantiate(baseImage, chartRect));
+            }
 
             UpdateChartSizeValues();
 
             SetMainAxisesPositionAndSize();
 
-            for (int i = -xStepCount; i <= xStepCount; i++)
+            for (int i = 0; i < axisDatas.Length; i++)
             {
-                if (i == 0) continue;
-
-                var tick = Instantiate(baseImage, chartRect);
-
-                SetTickPositionAndSize(tick, i, AxisType.X_Axis);
-
-                xAxisTicks.Add(i, tick);
-
-                if ((i + 1) % xAxisData.axisTickTextThinnes == 0)
-                {
-                    var text = Instantiate(baseText, chartRect);
-
-                    text.text = (xAxisData.max * xAxisData.stepPercent * i).ToString();
-
-                    SetTextPositionAndSize(text, i, AxisType.X_Axis);
-
-                    xAxisTexts.Add(i, text);
-                }
-            }
-
-            for (int i = -yStepCount; i <= yStepCount; i++)
-            {
-                if (i == 0) continue;
-                var tick = Instantiate(baseImage, chartRect);
-
-                SetTickPositionAndSize(tick, i, AxisType.Y_Axis);
-
-                yAxisTicks.Add(i, tick);
-
-                if ((i + 1) % yAxisData.axisTickTextThinnes == 0)
-                {
-                    var text = Instantiate(baseText, chartRect);
-
-                    text.text = (yAxisData.max * yAxisData.stepPercent * i).ToString();
-
-                    SetTextPositionAndSize(text, i, AxisType.Y_Axis);
-
-                    yAxisTexts.Add(i, text);
-                }
+                axisTicks.Add(new Dictionary<int, Image>());
+                axisTexts.Add(new Dictionary<int, TextMeshProUGUI>());
+                CreateAxis(i);
             }
         }
 
@@ -152,76 +129,61 @@ namespace EEA.Visualizer
 
             SetMainAxisesPositionAndSize();
 
-            for (int i = -xStepCount; i <= xStepCount; i++)
+            for (int i = 0; i < axisDatas.Length; i++)
             {
-                if (i == 0) continue;
-
-                SetTickPositionAndSize(xAxisTicks[i], i, AxisType.X_Axis);
-
-                if ((i + 1) % xAxisData.axisTickTextThinnes == 0)
-                {
-                    SetTextPositionAndSize(xAxisTexts[i], i, AxisType.X_Axis);
-                }
+                UpdateAxis(i);
             }
 
-            for (int i = -yStepCount; i <= yStepCount; i++)
-            {
-                if (i == 0) continue;
-
-                SetTickPositionAndSize(yAxisTicks[i], i, AxisType.Y_Axis);
-
-                if ((i + 1) % yAxisData.axisTickTextThinnes == 0)
-                {
-                    SetTextPositionAndSize(yAxisTexts[i], i, AxisType.Y_Axis);
-                }
-            }
-
-            if (currentPopulateType == ChartPopulateType.Dots)
+            if (currentPopulationConfig.type == ChartPopulateType.Dots)
             {
                 foreach (var dot in populatedDots)
                 {
-                    dot.Key.rectTransform.localPosition = GetPopulatedItemPos(dot.Value);
+                    dot.Key.rectTransform.localPosition = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, dot.Value);
                 }
             }
-            else if (currentPopulateType == ChartPopulateType.Line)
+            else if (currentPopulationConfig.type == ChartPopulateType.Line)
             {
                 int i = 0;
                 foreach (var lineCoordinate in populatedLine)
                 {
-                    chartLine.SetPosition(i++, GetPopulatedItemPos(lineCoordinate));
+                    chartLine.SetPosition(i++, GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, lineCoordinate));
                 }
             }
         }
 
-        public virtual void PopulateChart(ChartPopulateType type, List<Vector2> values, Color color)
+        public virtual void PopulateChart(PopulationConfig populationConfig)
         {
-            currentPopulateType = type;
+            currentPopulationConfig = populationConfig;
 
-            if (type == ChartPopulateType.Dots)
+            if (populationConfig.type == ChartPopulateType.Dots)
             {
-                foreach (var item in values)
+                foreach (var item in populationConfig.values)
                 {
-                    if ((Mathf.Abs(item.x) <= xAxisData.max) && (Mathf.Abs(item.y) <= yAxisData.max))
+                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
+
+                    if (chartRect.rect.Contains(pos))
                     {
-                        Image dot = DrawCircle(color, currentSizeX * .015f, GetPopulatedItemPos(item));
+                        Image dot = DrawCircle(populationConfig.color, currentSizeX * .015f, pos);
 
                         populatedDots.Add(dot, item);
                     }
                 }
             }
-            else if (type == ChartPopulateType.Line)
+            else if (populationConfig.type == ChartPopulateType.Line)
             {
-                chartLine.startColor = color;
-                chartLine.endColor = color;
+                chartLine.startColor = populationConfig.color;
+                chartLine.endColor = populationConfig.color;
 
                 List<Vector2> result = new List<Vector2>();
 
-                foreach (var item in values)
+                foreach (var item in populationConfig.values)
                 {
-                    if ((Mathf.Abs(item.x) <= xAxisData.max) && (Mathf.Abs(item.y) <= yAxisData.max))
+                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
+
+                    if (chartRect.rect.Contains(pos))
                     {
                         populatedLine.Add(item);
-                        result.Add(GetPopulatedItemPos(item));
+                        result.Add(pos);
                     }
                 }
 
@@ -235,26 +197,26 @@ namespace EEA.Visualizer
             }
         }
 
-        public virtual void UpdateChartPopulation(ChartPopulateType type, List<Vector2> values, Color color)
+        public virtual void UpdateChartPopulation(PopulationConfig populationConfig)
         {
-            currentPopulateType = type;
+            currentPopulationConfig = populationConfig;
 
-            if (type == ChartPopulateType.Dots)
+            if (populationConfig.type == ChartPopulateType.Dots)
             {
-                int i = 0;
-                if (values.Count > populatedDots.Count)
+                int i;
+                if (populationConfig.values.Count > populatedDots.Count)
                 {
-                    int diff = values.Count - populatedDots.Count;
+                    int diff = populationConfig.values.Count - populatedDots.Count;
                     for (i = 0; i < diff; i++)
                     {
-                        Image dot = DrawCircle(color, currentSizeX * .015f, GetPopulatedItemPos(Vector3.zero));
+                        Image dot = DrawCircle(populationConfig.color, currentSizeX * .015f, GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, Vector3.zero));
 
                         populatedDots.Add(dot, Vector3.zero);
                     }
                 }
-                else if (populatedDots.Count > values.Count)
+                else if (populatedDots.Count > populationConfig.values.Count)
                 {
-                    int diff = populatedDots.Count - values.Count;
+                    int diff = populatedDots.Count - populationConfig.values.Count;
                     for (i = 0; i < diff; i++)
                     {
                         var dot = populatedDots.Last();
@@ -267,22 +229,27 @@ namespace EEA.Visualizer
                 i = 0;
                 foreach (var item in populatedDots)
                 {
-                    item.Key.rectTransform.localPosition = GetPopulatedItemPos(values[i++]);
+                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, populationConfig.values[i++]);
+                    if (chartRect.rect.Contains(pos))
+                    {
+                        item.Key.rectTransform.localPosition = pos;
+                    }
                 }
             }
-            else if (type == ChartPopulateType.Line)
+            else if (populationConfig.type == ChartPopulateType.Line)
             {
-                chartLine.startColor = color;
-                chartLine.endColor = color;
+                chartLine.startColor = populationConfig.color;
+                chartLine.endColor = populationConfig.color;
 
                 List<Vector2> result = new List<Vector2>();
 
-                foreach (var item in values)
+                foreach (var item in populationConfig.values)
                 {
-                    if ((Mathf.Abs(item.x) <= xAxisData.max) && (Mathf.Abs(item.y) <= yAxisData.max))
+                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
+                    if (chartRect.rect.Contains(pos))
                     {
                         populatedLine.Add(item);
-                        result.Add(GetPopulatedItemPos(item));
+                        result.Add(item);
                     }
                 }
 
@@ -296,33 +263,80 @@ namespace EEA.Visualizer
             }
         }
 
-        #region SIZE AND POSITION UPDATE UTILITIES
-
-        protected virtual void SetTickPositionAndSize(Image tick, int index, AxisType axis)
+        protected virtual void CreateAxis(int axisIndex)
         {
-            if (axis == AxisType.X_Axis)
+            AxisData axisData = axisDatas[axisIndex];
+
+            int stepCount = (int)Mathf.Round(1.0f / axisData.stepPercent);
+            int stepCountHalf = (int)Mathf.Round(stepCount * .5f);
+
+            float stepAmount = (axisData.max - axisData.min) * axisData.stepPercent;
+
+            for (int i = -stepCountHalf; i <= stepCountHalf; i++)
             {
-                tick.rectTransform.localPosition = new Vector2(index * stepWidth, 0) + AxisOriantationOffset(AxisType.X_Axis);
+                var tick = Instantiate(baseImage, chartRect);
+
+                SetTickPositionAndSize(tick, i, axisIndex);
+
+                axisTicks[axisIndex].Add(i, tick);
+
+                if ((i + 1) % axisData.axisTickTextThinnes == 0)
+                {
+                    var text = Instantiate(baseText, chartRect);
+
+                    text.text = (axisData.min + (stepAmount * (i + stepCountHalf))).ToString();
+
+                    SetTextPositionAndSize(text, i, axisIndex);
+
+                    axisTexts[axisIndex].Add(i, text);
+                }
+            }
+        }
+
+        protected virtual void UpdateAxis(int axisIndex)
+        {
+            AxisData axisData = axisDatas[axisIndex];
+
+            int stepCount = (int)Mathf.Round(1.0f / axisData.stepPercent);
+            int stepCountHalf = (int)Mathf.Round(stepCount * .5f);
+
+            for (int i = -stepCountHalf; i <= stepCountHalf; i++)
+            {
+                SetTickPositionAndSize(axisTicks[axisIndex][i], i, axisIndex);
+
+                if ((i + 1) % axisData.axisTickTextThinnes == 0)
+                {
+                    SetTextPositionAndSize(axisTexts[axisIndex][i], i, axisIndex);
+                }
+            }
+        }
+
+        #region SIZE AND POSITION UPDATE UTILITIES
+        protected virtual void SetTickPositionAndSize(Image tick, int index, int axisIndex)
+        {
+            if (axisDatas[axisIndex].axisType == AxisType.X_Axis)
+            {
+                tick.rectTransform.localPosition = new Vector2(index * stepDists[axisIndex], 0) + AxisOriantationOffset(axisDatas[axisIndex]);
 
                 tick.rectTransform.sizeDelta = new Vector2(3, halfWidth * .02f);
             }
-            else if (axis == AxisType.Y_Axis)
+            else if (axisDatas[axisIndex].axisType == AxisType.Y_Axis)
             {
-                tick.rectTransform.localPosition = new Vector2(0, index * stepHeight) + AxisOriantationOffset(AxisType.Y_Axis);
+                tick.rectTransform.localPosition = new Vector2(0, index * stepDists[axisIndex]) + AxisOriantationOffset(axisDatas[axisIndex]);
 
                 tick.rectTransform.sizeDelta = new Vector2(halfHeight * .02f, 3);
             }
         }
 
-        protected virtual void SetTextPositionAndSize(TextMeshProUGUI text, int index, AxisType axis)
+        protected virtual void SetTextPositionAndSize(TextMeshProUGUI text, int index, int axisIndex)
         {
-            if (axis == AxisType.X_Axis)
+            if (axisDatas[axisIndex].axisType == AxisType.X_Axis)
             {
-                text.rectTransform.localPosition = new Vector2(index * stepWidth, stepHeight * -.3f) + AxisOriantationOffset(AxisType.X_Axis);
+                text.rectTransform.localPosition = new Vector2(index * stepDists[axisIndex], halfHeight* -.03f) + AxisOriantationOffset(axisDatas[axisIndex]);
             }
-            else if (axis == AxisType.Y_Axis)
+            else if (axisDatas[axisIndex].axisType == AxisType.Y_Axis)
             {
-                text.rectTransform.localPosition = new Vector2(stepHeight * -.3f, index * stepHeight) + AxisOriantationOffset(AxisType.Y_Axis);
+                text.rectTransform.localPosition = new Vector2(halfWidth * -.03f, index * stepDists[axisIndex]) + AxisOriantationOffset(axisDatas[axisIndex]);
             }
 
             text.fontSize = halfWidth / 25.0f;
@@ -331,19 +345,27 @@ namespace EEA.Visualizer
 
         protected virtual void SetMainAxisesPositionAndSize()
         {
-            xAxisImage.rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(AxisType.X_Axis);// new Vector2(0, halfHeight) * (int)xAxisData.orientation;
-            yAxisImage.rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(AxisType.Y_Axis);//new Vector2(halfWidth, 0) * (int)yAxisData.orientation;
-
-            xAxisImage.rectTransform.sizeDelta = new Vector2(currentSizeX, 3);
-            yAxisImage.rectTransform.sizeDelta = new Vector2(3, currentSizeY);
+            for (int i = 0; i < axisDatas.Length; i++)
+            {
+                if (axisDatas[i].axisType == AxisType.X_Axis)
+                {
+                    axisImages[i].rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(axisDatas[i]);
+                    axisImages[i].rectTransform.sizeDelta = new Vector2(currentSizeX, 3);
+                }
+                else
+                {
+                    axisImages[i].rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(axisDatas[i]);
+                    axisImages[i].rectTransform.sizeDelta = new Vector2(3, currentSizeY);
+                }
+            }
         }
 
-        private Vector2 AxisOriantationOffset(AxisType axisType)
+        private Vector2 AxisOriantationOffset(AxisData axisData)
         {
-            if (axisType == AxisType.X_Axis)
-                return new Vector2(0, halfHeight) * (int)xAxisData.orientation;
+            if (axisData.axisType == AxisType.X_Axis)
+                return new Vector2(0, halfHeight) * (int)axisData.orientation;
             else 
-                return new Vector2(halfWidth, 0) * (int)yAxisData.orientation;
+                return new Vector2(halfWidth, 0) * (int)axisData.orientation;
         }
 
         protected virtual void UpdateChartSizeValues()
@@ -354,22 +376,34 @@ namespace EEA.Visualizer
             halfWidth = currentSizeX * .5f;
             halfHeight = currentSizeY * .5f;
 
-            stepWidth = halfWidth * xAxisData.stepPercent;
-            stepHeight = halfHeight * yAxisData.stepPercent;
+            stepDists.Clear();
 
-            xStepCount = (int)(1.0f / xAxisData.stepPercent);
-            yStepCount = (int)(1.0f / yAxisData.stepPercent);
+            foreach (var item in axisDatas)
+            {
+                if (item.axisType == AxisType.X_Axis)
+                {
+                    stepDists.Add(currentSizeX * item.stepPercent);
+                }
+                else
+                {
+                    stepDists.Add(currentSizeY * item.stepPercent);
+                }
+            }
+
         }
 
-        protected virtual Vector3 GetPopulatedItemPos(Vector2 coordinate)
+        protected virtual Vector3 GetPopulatedItemPos(string xAxisKey, string yAxisKey, Vector2 coordinate)
         {
-            float xPercent = (float)coordinate.x / (float)xAxisData.max;
+            AxisData xAxisData = axisDatas.FirstOrDefault(s => s.key == xAxisKey);
+            AxisData yAxisData = axisDatas.FirstOrDefault(s => s.key == yAxisKey);
 
-            float xPos = (currentSizeX * .5f) * xPercent;
+            float xPercent = (float)coordinate.x / (float)(xAxisData.max - xAxisData.min);
 
-            float yPercent = (float)coordinate.y / (float)yAxisData.max;
+            float xPos = currentSizeX * xPercent;
 
-            float yPos = (currentSizeY * .5f) * yPercent;
+            float yPercent = (float)coordinate.y / (float)(yAxisData.max - yAxisData.min);
+
+            float yPos = currentSizeY * yPercent;
 
             return new Vector3(xPos, yPos);
         }

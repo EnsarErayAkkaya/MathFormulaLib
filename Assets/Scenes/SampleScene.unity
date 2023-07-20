@@ -332,15 +332,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chartVisualizer: {fileID: 531792215}
   expression:
-    expression: (((x-3) * 2)+((y-3) * 2))-9
+    expression: '#cos(#sin(x)) *20'
     variables:
     - name: 120
-      value: -5
-      max: 5
-      step: 0.0075
-    - name: 121
-      value: -5
-      max: 5
+      value: -10
+      max: 10
       step: 0.0075
 --- !u!1 &1225068973
 GameObject:
@@ -608,11 +604,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: xAxisData.max
-      value: 30
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: yAxisData.max
-      value: 30
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: xAxisData.orientation
@@ -620,11 +620,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: yAxisData.orientation
-      value: -1
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: yAxisData.stepPercent
       value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].key
+      value: mainX
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].max
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].min
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].key
+      value: mainY
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].max
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].min
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].key
+      value: mainX2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].max
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].min
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].title
+      value: Main X
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].title
+      value: Main Y
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].title
+      value: Main X2
       objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: xAxisData.axisTickTextThinnes
@@ -633,6 +681,50 @@ PrefabInstance:
     - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: yAxisData.axisTickTextThinnes
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].axisType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].axisType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].orientation
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].stepPercent
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].orientation
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].stepPercent
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].orientation
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].stepPercent
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].axisTickTextThinnes
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].axisTickTextThinnes
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[2].axisTickTextThinnes
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6123385842693523294, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: m_AnchorMax.x
