@@ -222,8 +222,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1446226882555573309}
   - component: {fileID: 1446226882555573311}
-  - component: {fileID: 1446226882555573310}
   - component: {fileID: 8798635351676425008}
+  - component: {fileID: 1458983024299547568}
   m_Layer: 5
   m_Name: Chart
   m_TagString: Untagged
@@ -261,35 +261,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1446226882555573306}
   m_CullTransparentMesh: 1
---- !u!114 &1446226882555573310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1446226882555573306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38652f3916808b549b11e8d09251dc49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chartRect: {fileID: 6123385842693523294}
-  baseImage: {fileID: 7339760444300979889, guid: e1a1ab3bb1294ad4e8f9021147df6e88, type: 3}
-  baseText: {fileID: 1426882894385559721, guid: fc16c68f902dea24fbf8b17a7fd2e905, type: 3}
-  baseCircle: {fileID: 944658382768705178, guid: 8d666d7466ce9fe4b810e8ba22cf2040, type: 3}
-  xAxisData:
-    min: 0
-    max: 1.5
-    stepPercent: 0.05
-    axisTickTextThinnes: 3
-    orientation: 0
-  yAxisData:
-    min: 0
-    max: 1.5
-    stepPercent: 0.05
-    axisTickTextThinnes: 4
-    orientation: 0
-  chartLine: {fileID: 1446226882376757397}
 --- !u!114 &8798635351676425008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,3 +291,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1458983024299547568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1446226882555573306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38652f3916808b549b11e8d09251dc49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chartRect: {fileID: 6123385842693523294}
+  baseImage: {fileID: 7339760444300979889, guid: e1a1ab3bb1294ad4e8f9021147df6e88, type: 3}
+  baseText: {fileID: 1426882894385559721, guid: fc16c68f902dea24fbf8b17a7fd2e905, type: 3}
+  baseCircle: {fileID: 944658382768705178, guid: 8d666d7466ce9fe4b810e8ba22cf2040, type: 3}
+  axisDatas:
+  - min: -10
+    max: 10
+    stepPercent: 0.1
+    title: mainX
+    key: mainX
+    axisType: 0
+    axisTickTextThinnes: 1
+    orientation: -1
+  - min: 0
+    max: 40
+    stepPercent: 0.1
+    title: mainY
+    key: mainY
+    axisType: 1
+    axisTickTextThinnes: 1
+    orientation: -1
+  chartLine: {fileID: 1446226882376757397}

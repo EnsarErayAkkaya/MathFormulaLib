@@ -14,7 +14,7 @@ struct ExpressionHolder
 
 public class main : MonoBehaviour
 {
-    [SerializeField] private ChartVisualizer chartVisualizer;
+    [SerializeField] private ChartBase chartVisualizer;
     [SerializeField] private ExpressionHolder expression;
 
     MathFormula formula = new MathFormula();
@@ -58,7 +58,7 @@ public class main : MonoBehaviour
         chartVisualizer.SetUpChart();
 
         PopulationConfig config;
-        config.type = ChartPopulateType.Line;
+        config.type = ChartPopulateType.Column;
         config.values = values;
         config.color = Color.red;
         config.xAxisKey = "mainX";

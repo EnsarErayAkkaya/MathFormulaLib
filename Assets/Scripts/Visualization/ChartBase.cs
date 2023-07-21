@@ -52,10 +52,10 @@ namespace EEA.Visualizer
     [System.Serializable]
     public enum ChartPopulateType
     {
-        Dots, Line
+        Dots, Line, Column
     }
 
-    public class ChartBase: MonoBehaviour
+    public abstract class ChartBase: MonoBehaviour
     {
         [Header("Chart Rect")]
         [SerializeField] protected RectTransform chartRect;
@@ -76,6 +76,7 @@ namespace EEA.Visualizer
         protected List<Dictionary<int, Image>> axisTicks = new List<Dictionary<int, Image>>();
         protected List<Dictionary<int, TextMeshProUGUI>> axisTexts = new List<Dictionary<int, TextMeshProUGUI>>();
 
+        protected Dictionary<Image, Vector2> populatedColumns = new Dictionary<Image, Vector2>();
         protected Dictionary<Image, Vector2> populatedDots = new Dictionary<Image, Vector2>();
         protected List<Vector2> populatedLine = new List<Vector2>();
 
@@ -96,202 +97,21 @@ namespace EEA.Visualizer
             OnUpdate();
         }
 
-        protected virtual void OnUpdate()
-        {
-            if ((chartRect.rect.width != currentSizeX) || (chartRect.rect.height != currentSizeY))
-            {
-                OnChartSizeChanged();
-            }
-        }
+        protected abstract void OnUpdate();
 
-        public virtual void SetUpChart()
-        {
-            foreach (var item in axisDatas)
-            {
-                axisImages.Add(Instantiate(baseImage, chartRect));
-            }
+        // SETUP CHART
+        public abstract void SetUpChart();
 
-            UpdateChartSizeValues();
+        // CALLED WHEN CHART SIZE CHANGED
+        public abstract void OnChartSizeChanged();
 
-            SetMainAxisesPositionAndSize();
+        public abstract void PopulateChart(PopulationConfig populationConfig);
 
-            for (int i = 0; i < axisDatas.Length; i++)
-            {
-                axisTicks.Add(new Dictionary<int, Image>());
-                axisTexts.Add(new Dictionary<int, TextMeshProUGUI>());
-                CreateAxis(i);
-            }
-        }
+        public abstract void UpdateChartPopulation(PopulationConfig populationConfig);
 
-        public virtual void OnChartSizeChanged()
-        {
-            UpdateChartSizeValues();
+        protected abstract void CreateAxis(int axisIndex);
 
-            SetMainAxisesPositionAndSize();
-
-            for (int i = 0; i < axisDatas.Length; i++)
-            {
-                UpdateAxis(i);
-            }
-
-            if (currentPopulationConfig.type == ChartPopulateType.Dots)
-            {
-                foreach (var dot in populatedDots)
-                {
-                    dot.Key.rectTransform.localPosition = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, dot.Value);
-                }
-            }
-            else if (currentPopulationConfig.type == ChartPopulateType.Line)
-            {
-                int i = 0;
-                foreach (var lineCoordinate in populatedLine)
-                {
-                    chartLine.SetPosition(i++, GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, lineCoordinate));
-                }
-            }
-        }
-
-        public virtual void PopulateChart(PopulationConfig populationConfig)
-        {
-            currentPopulationConfig = populationConfig;
-
-            if (populationConfig.type == ChartPopulateType.Dots)
-            {
-                foreach (var item in populationConfig.values)
-                {
-                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
-
-                    if (chartRect.rect.Contains(pos))
-                    {
-                        Image dot = DrawCircle(populationConfig.color, currentSizeX * .015f, pos);
-
-                        populatedDots.Add(dot, item);
-                    }
-                }
-            }
-            else if (populationConfig.type == ChartPopulateType.Line)
-            {
-                chartLine.startColor = populationConfig.color;
-                chartLine.endColor = populationConfig.color;
-
-                List<Vector2> result = new List<Vector2>();
-
-                foreach (var item in populationConfig.values)
-                {
-                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
-
-                    if (chartRect.rect.Contains(pos))
-                    {
-                        populatedLine.Add(item);
-                        result.Add(pos);
-                    }
-                }
-
-                chartLine.positionCount = result.Count;
-
-                int i = 0;
-                foreach (var item in result)
-                {
-                    chartLine.SetPosition(i++, item);
-                }
-            }
-        }
-
-        public virtual void UpdateChartPopulation(PopulationConfig populationConfig)
-        {
-            currentPopulationConfig = populationConfig;
-
-            if (populationConfig.type == ChartPopulateType.Dots)
-            {
-                int i;
-                if (populationConfig.values.Count > populatedDots.Count)
-                {
-                    int diff = populationConfig.values.Count - populatedDots.Count;
-                    for (i = 0; i < diff; i++)
-                    {
-                        Image dot = DrawCircle(populationConfig.color, currentSizeX * .015f, GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, Vector3.zero));
-
-                        populatedDots.Add(dot, Vector3.zero);
-                    }
-                }
-                else if (populatedDots.Count > populationConfig.values.Count)
-                {
-                    int diff = populatedDots.Count - populationConfig.values.Count;
-                    for (i = 0; i < diff; i++)
-                    {
-                        var dot = populatedDots.Last();
-
-                        populatedDots.Remove(dot.Key);
-                        Destroy(dot.Key.gameObject);
-                    }
-                }
-
-                i = 0;
-                foreach (var item in populatedDots)
-                {
-                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, populationConfig.values[i++]);
-                    if (chartRect.rect.Contains(pos))
-                    {
-                        item.Key.rectTransform.localPosition = pos;
-                    }
-                }
-            }
-            else if (populationConfig.type == ChartPopulateType.Line)
-            {
-                chartLine.startColor = populationConfig.color;
-                chartLine.endColor = populationConfig.color;
-
-                List<Vector2> result = new List<Vector2>();
-
-                foreach (var item in populationConfig.values)
-                {
-                    Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
-                    if (chartRect.rect.Contains(pos))
-                    {
-                        populatedLine.Add(item);
-                        result.Add(item);
-                    }
-                }
-
-                chartLine.positionCount = result.Count;
-
-                int i = 0;
-                foreach (var item in result)
-                {
-                    chartLine.SetPosition(i++, item);
-                }
-            }
-        }
-
-        protected virtual void CreateAxis(int axisIndex)
-        {
-            AxisData axisData = axisDatas[axisIndex];
-
-            int stepCount = (int)Mathf.Round(1.0f / axisData.stepPercent);
-            int stepCountHalf = (int)Mathf.Round(stepCount * .5f);
-
-            float stepAmount = (axisData.max - axisData.min) * axisData.stepPercent;
-
-            for (int i = -stepCountHalf; i <= stepCountHalf; i++)
-            {
-                var tick = Instantiate(baseImage, chartRect);
-
-                SetTickPositionAndSize(tick, i, axisIndex);
-
-                axisTicks[axisIndex].Add(i, tick);
-
-                if ((i + 1) % axisData.axisTickTextThinnes == 0)
-                {
-                    var text = Instantiate(baseText, chartRect);
-
-                    text.text = (axisData.min + (stepAmount * (i + stepCountHalf))).ToString();
-
-                    SetTextPositionAndSize(text, i, axisIndex);
-
-                    axisTexts[axisIndex].Add(i, text);
-                }
-            }
-        }
+        #region SIZE AND POSITION UPDATE UTILITIES
 
         protected virtual void UpdateAxis(int axisIndex)
         {
@@ -311,7 +131,6 @@ namespace EEA.Visualizer
             }
         }
 
-        #region SIZE AND POSITION UPDATE UTILITIES
         protected virtual void SetTickPositionAndSize(Image tick, int index, int axisIndex)
         {
             if (axisDatas[axisIndex].axisType == AxisType.X_Axis)
@@ -360,7 +179,7 @@ namespace EEA.Visualizer
             }
         }
 
-        private Vector2 AxisOriantationOffset(AxisData axisData)
+        protected Vector2 AxisOriantationOffset(AxisData axisData)
         {
             if (axisData.axisType == AxisType.X_Axis)
                 return new Vector2(0, halfHeight) * (int)axisData.orientation;
@@ -409,6 +228,18 @@ namespace EEA.Visualizer
         }
 
         #endregion
+
+        protected int GetAxisIndexByKey(string key)
+        {
+            for (int i = 0; i < axisDatas.Length; i++)
+            {
+                if (axisDatas[i].key == key)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
         protected virtual Image DrawCircle(Color color, float width, Vector2 position)
         {

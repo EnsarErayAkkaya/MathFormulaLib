@@ -128,9 +128,9 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1446226882555573309, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
   m_PrefabInstance: {fileID: 1446226882581951849}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &531792215 stripped
+--- !u!114 &531792213 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
   m_PrefabInstance: {fileID: 1446226882581951849}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
@@ -330,14 +330,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7d92de504d856439c6af315926c700, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chartVisualizer: {fileID: 531792215}
+  chartVisualizer: {fileID: 531792213}
   expression:
     expression: '#cos(#sin(x)) *20'
     variables:
     - name: 120
-      value: -10
-      max: 10
-      step: 0.0075
+      value: -5
+      max: 5
+      step: 0.5
 --- !u!1 &1225068973
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,6 +726,30 @@ PrefabInstance:
       propertyPath: axisDatas.Array.data[2].axisTickTextThinnes
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: baseText
+      value: 
+      objectReference: {fileID: 1426882894385559721, guid: fc16c68f902dea24fbf8b17a7fd2e905, type: 3}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: baseImage
+      value: 
+      objectReference: {fileID: 7339760444300979889, guid: e1a1ab3bb1294ad4e8f9021147df6e88, type: 3}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: baseCircle
+      value: 
+      objectReference: {fileID: 944658382768705178, guid: 8d666d7466ce9fe4b810e8ba22cf2040, type: 3}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].max
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].min
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].max
+      value: 26
+      objectReference: {fileID: 0}
     - target: {fileID: 6123385842693523294, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -758,5 +782,7 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1446226882555573310, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+    - {fileID: 1689889686349708754, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
