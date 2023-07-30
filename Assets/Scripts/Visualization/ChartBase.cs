@@ -7,6 +7,7 @@ using static UnityEditor.Progress;
 using System.Linq;
 using static UnityEditor.PlayerSettings;
 using UnityEditor;
+using System;
 
 namespace EEA.Visualizer
 {
@@ -21,6 +22,7 @@ namespace EEA.Visualizer
         public string key;
 
         public AxisType axisType;
+        public Color color;
 
         public int axisTickTextThinnes;
         public AxisOrientation orientation;
@@ -40,7 +42,7 @@ namespace EEA.Visualizer
     [System.Serializable]
     public enum AxisOrientation
     {
-        Start = -1, Center = 0, End = 1
+        Start = 0, Center = 1, End = 2
     }
 
     [System.Serializable]
@@ -118,9 +120,8 @@ namespace EEA.Visualizer
             AxisData axisData = axisDatas[axisIndex];
 
             int stepCount = (int)Mathf.Round(1.0f / axisData.stepPercent);
-            int stepCountHalf = (int)Mathf.Round(stepCount * .5f);
 
-            for (int i = -stepCountHalf; i <= stepCountHalf; i++)
+            for (int i = 0; i <= stepCount; i++)
             {
                 SetTickPositionAndSize(axisTicks[axisIndex][i], i, axisIndex);
 
@@ -145,6 +146,9 @@ namespace EEA.Visualizer
 
                 tick.rectTransform.sizeDelta = new Vector2(halfHeight * .02f, 3);
             }
+
+            tick.rectTransform.anchorMin = GetPopulatedItemAnchor();
+            tick.rectTransform.anchorMax = GetPopulatedItemAnchor();
         }
 
         protected virtual void SetTextPositionAndSize(TextMeshProUGUI text, int index, int axisIndex)
@@ -159,7 +163,8 @@ namespace EEA.Visualizer
             }
 
             text.fontSize = halfWidth / 25.0f;
-
+            text.rectTransform.anchorMin = GetPopulatedItemAnchor();
+            text.rectTransform.anchorMax = GetPopulatedItemAnchor();
         }
 
         protected virtual void SetMainAxisesPositionAndSize()
@@ -169,13 +174,17 @@ namespace EEA.Visualizer
                 if (axisDatas[i].axisType == AxisType.X_Axis)
                 {
                     axisImages[i].rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(axisDatas[i]);
-                    axisImages[i].rectTransform.sizeDelta = new Vector2(currentSizeX, 3);
+                    axisImages[i].rectTransform.sizeDelta = new Vector2(currentSizeX, 5);
                 }
                 else
                 {
                     axisImages[i].rectTransform.localPosition = Vector2.zero + AxisOriantationOffset(axisDatas[i]);
-                    axisImages[i].rectTransform.sizeDelta = new Vector2(3, currentSizeY);
+                    axisImages[i].rectTransform.sizeDelta = new Vector2(5, currentSizeY);
                 }
+
+                axisImages[i].rectTransform.pivot = Vector2.zero;
+                axisImages[i].rectTransform.anchorMin = GetPopulatedItemAnchor();
+                axisImages[i].rectTransform.anchorMax = GetPopulatedItemAnchor();
             }
         }
 
@@ -216,15 +225,25 @@ namespace EEA.Visualizer
             AxisData xAxisData = axisDatas.FirstOrDefault(s => s.key == xAxisKey);
             AxisData yAxisData = axisDatas.FirstOrDefault(s => s.key == yAxisKey);
 
-            float xPercent = (float)coordinate.x / (float)(xAxisData.max - xAxisData.min);
+            float xPercent = coordinate.x.Remap01(xAxisData.min, xAxisData.max);
 
             float xPos = currentSizeX * xPercent;
 
-            float yPercent = (float)coordinate.y / (float)(yAxisData.max - yAxisData.min);
+            float yPercent = coordinate.y.Remap01(yAxisData.min, yAxisData.max);
 
             float yPos = currentSizeY * yPercent;
 
             return new Vector3(xPos, yPos);
+        }
+
+        protected virtual Vector3 ConvertAnchoredPosToCenteredPos(Vector3 pos)
+        {
+            return new Vector3(-halfWidth, -halfHeight) + pos;
+        }
+
+        protected virtual Vector2 GetPopulatedItemAnchor()
+        {
+            return Vector2.zero;
         }
 
         #endregion
@@ -247,6 +266,9 @@ namespace EEA.Visualizer
 
             dot.rectTransform.sizeDelta = new Vector2(width, width);
             dot.rectTransform.localPosition = position;
+
+            dot.rectTransform.anchorMin = GetPopulatedItemAnchor();
+            dot.rectTransform.anchorMax = GetPopulatedItemAnchor();
 
             dot.color = color;
 

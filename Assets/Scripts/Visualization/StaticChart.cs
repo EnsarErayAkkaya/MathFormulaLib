@@ -77,7 +77,7 @@ namespace EEA.Visualizer
                 {
                     Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
 
-                    if (chartRect.rect.Contains(pos))
+                    if (chartRect.rect.Contains(ConvertAnchoredPosToCenteredPos(pos)))
                     {
                         Image dot = DrawCircle(populationConfig.color, currentSizeX * .015f, pos);
 
@@ -96,7 +96,7 @@ namespace EEA.Visualizer
                 {
                     Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
 
-                    if (chartRect.rect.Contains(pos))
+                    if (chartRect.rect.Contains(ConvertAnchoredPosToCenteredPos(pos)))
                     {
                         populatedLine.Add(item);
                         result.Add(pos);
@@ -116,29 +116,48 @@ namespace EEA.Visualizer
                 chartLine.startColor = populationConfig.color;
                 chartLine.endColor = populationConfig.color;
 
-                List<Vector2> result = new List<Vector2>();
-
                 int xAxisIndex = GetAxisIndexByKey(currentPopulationConfig.xAxisKey);
+
+                float columnPosY = AxisOriantationOffset(axisDatas[xAxisIndex]).y;
+
+                float calculateColumnHeight(float posY)
+                {
+                    return Mathf.Abs(posY - columnPosY);
+                }
+
+                float calculateColumnRotation(float posY)
+                {
+                    switch (axisDatas[xAxisIndex].orientation)
+                    {
+                        case AxisOrientation.Start:
+                            return 0;
+                        case AxisOrientation.Center:
+                            return 180 * ((posY - columnPosY) > 0 ? 0 : 1);
+                        case AxisOrientation.End:
+                            return 180;
+                        default:
+                            return 0;
+                    }
+                }
 
                 foreach (var item in populationConfig.values)
                 {
                     Vector2 pos = GetPopulatedItemPos(currentPopulationConfig.xAxisKey, currentPopulationConfig.yAxisKey, item);
 
-                    if (chartRect.rect.Contains(pos))
+                    if (chartRect.rect.Contains(ConvertAnchoredPosToCenteredPos(pos)))
                     {
                         Image column = Instantiate(baseImage, chartRect);
+
                         column.rectTransform.pivot = new Vector2(.5f, 0);
-                        column.rectTransform.sizeDelta = new Vector2(stepDists[xAxisIndex] * .4f, pos.y);
-                        column.rectTransform.localPosition = new Vector3(pos.x, 0) + (Vector3)AxisOriantationOffset(axisDatas[xAxisIndex]);
+
+                        column.rectTransform.localRotation = Quaternion.Euler(0, 0, calculateColumnRotation(pos.y));
+
+                        column.rectTransform.sizeDelta = new Vector2(stepDists[xAxisIndex] * .4f, calculateColumnHeight(pos.y));
+                        column.rectTransform.localPosition = new Vector3(pos.x, columnPosY);
+
+                        column.rectTransform.anchorMin = GetPopulatedItemAnchor();
+                        column.rectTransform.anchorMax = GetPopulatedItemAnchor();
                     }
-                }
-
-                chartLine.positionCount = result.Count;
-
-                int i = 0;
-                foreach (var item in result)
-                {
-                    chartLine.SetPosition(i++, item);
                 }
             }
         }
@@ -213,12 +232,14 @@ namespace EEA.Visualizer
         {
             AxisData axisData = axisDatas[axisIndex];
 
+            axisImages[axisIndex].color = axisData.color;
+
             int stepCount = (int)Mathf.Round(1.0f / axisData.stepPercent);
             int stepCountHalf = (int)Mathf.Round(stepCount * .5f);
 
             float stepAmount = (axisData.max - axisData.min) * axisData.stepPercent;
 
-            for (int i = -stepCountHalf; i <= stepCountHalf; i++)
+            for (int i = 0; i <= stepCount; i++)
             {
                 var tick = Instantiate(baseImage, chartRect);
 
@@ -230,7 +251,7 @@ namespace EEA.Visualizer
                 {
                     var text = Instantiate(baseText, chartRect);
 
-                    text.text = (axisData.min + (stepAmount * (i + stepCountHalf))).ToString();
+                    text.text = (stepAmount * (i - stepCountHalf)).ToString();
 
                     SetTextPositionAndSize(text, i, axisIndex);
 

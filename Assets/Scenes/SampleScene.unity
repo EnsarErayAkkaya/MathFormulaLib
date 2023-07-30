@@ -332,11 +332,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chartVisualizer: {fileID: 531792213}
   expression:
-    expression: '#cos(#sin(x)) *20'
+    expression: '#cos(#sin(x)) * 5'
     variables:
     - name: 120
-      value: -5
-      max: 5
+      value: -4
+      max: 4
       step: 0.5
 --- !u!1 &1225068973
 GameObject:
@@ -356,7 +356,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1225068974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -514,6 +514,42 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1225068977}
     m_Modifications:
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446226882376757394, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1446226882555573306, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: m_Name
       value: Chart
@@ -748,7 +784,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: axisDatas.Array.data[1].max
-      value: 26
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].min
+      value: -6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].color.g
+      value: 0.91796017
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].color.b
+      value: 0.062781096
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[0].orientation
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1458983024299547568, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
+      propertyPath: axisDatas.Array.data[1].orientation
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6123385842693523294, guid: d4628562733ca6e4b9ef7d418564b171, type: 3}
       propertyPath: m_AnchorMax.x

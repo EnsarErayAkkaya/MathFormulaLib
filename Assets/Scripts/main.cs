@@ -30,9 +30,11 @@ public class main : MonoBehaviour
 
         bool variableReachedLimit = false;
 
+        Debug.Log(expression.expression);
+
         while (!variableReachedLimit)
         {
-            float result = (float)formula.Parse(expression.expression);
+            float result = (float)formula.Calculate(expression.expression);
 
             //Debug.LogFormat("expr: " + expression.expression + ", result: " + result.ToString());
 
@@ -55,15 +57,33 @@ public class main : MonoBehaviour
             }
         }
 
-        chartVisualizer.SetUpChart();
+        Debug.Log(formula.ToString());
+
+       /* chartVisualizer.SetUpChart();
 
         PopulationConfig config;
-        config.type = ChartPopulateType.Column;
+        config.type = ChartPopulateType.Line;
+        config.values = values;
+        config.color = Color.red;
+        config.xAxisKey = "mainX";
+        config.yAxisKey = "mainY";
+
+        chartVisualizer.PopulateChart(config);*/
+
+        /*config.type = ChartPopulateType.Line;
         config.values = values;
         config.color = Color.red;
         config.xAxisKey = "mainX";
         config.yAxisKey = "mainY";
 
         chartVisualizer.PopulateChart(config);
+
+        /*config.type = ChartPopulateType.Dots;
+        config.values = values;
+        config.color = Color.red;
+        config.xAxisKey = "mainX";
+        config.yAxisKey = "mainY";
+
+        chartVisualizer.PopulateChart(config);*/
     }
 }
